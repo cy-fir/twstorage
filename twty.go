@@ -12,7 +12,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strings"
 
 	"github.com/fatih/color"
 	"github.com/garyburd/go-oauth/oauth"
@@ -169,24 +168,6 @@ func postTweet(token *oauth.Credentials, msg string, replyId string) (tweet Twee
 	}
 
 	return tweet, nil
-}
-
-// URL starts at bottom of chain and works way to top
-func getTweetChain(token *oauth.Credentials, tweetId string) (str string, err error) {
-	var tweet Tweet
-
-	for tweetId != "" {
-		tweet, err = getTweet(token, tweetId)
-		if err != nil {
-			return "", err
-		}
-
-		// TODO: use screenname, strip RT proper
-		str = strings.Replace(tweet.Text, "@mkaz ", "", 1) + str
-		tweetId = tweet.ReplyId
-	}
-
-	return str, nil
 }
 
 func getTweet(token *oauth.Credentials, tweetId string) (tweet Tweet, err error) {

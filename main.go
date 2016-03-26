@@ -37,6 +37,9 @@ twstorage --key <key> --nonce <nonce> <url>
 	os.Exit(1)
 }
 
+// a quick hack for username, since used in reply
+const TwitterUsername string = "mkaz"
+
 var key string
 var token *oauth.Credentials
 
@@ -74,8 +77,10 @@ func main() {
 			log.Fatalln("Error encrypting file", err)
 		}
 
-		// chunkify
-		chunks := chunkify(enc, 132)
+		// chunkify tweet limits
+		chunksize := 137 - len(TwitterUsername)
+		fmt.Println("Chunk Size: ", chunksize)
+		chunks := chunkify(enc, chunksize)
 
 		// upload to twitter
 		var tweet, first Tweet
@@ -84,7 +89,7 @@ func main() {
 			// initial tweet
 			fmt.Println("Tweeting chunk: ", i)
 			if i != 0 {
-				chunk = fmt.Sprintf("@mkaz %s", chunk) // TODO: use screenname, shrink chunksize
+				chunk = fmt.Sprintf("@%s %s", TwitterUsername, chunk)
 			}
 
 			tweet, err = postTweet(token, chunk, tweet.Identifier)
@@ -125,6 +130,25 @@ func main() {
 
 	fmt.Println(dec)
 
+}
+
+// URL starts at bottom of chain and works way to top
+func getTweetChain(token *oauth.Credentials, tweetId string) (str string, err error) {
+	var tweet Tweet
+
+	for tweetId != "" {
+		tweet, err = getTweet(token, tweetId)
+		if err != nil {
+			return "", err
+		}
+
+		// TODO: use screenname, strip RT proper
+		rt := fmt.Sprintf("@%s ", TwitterUsername)
+		str = strings.Replace(tweet.Text, rt, "", 1) + str
+		tweetId = tweet.ReplyId
+	}
+
+	return str, nil
 }
 
 func TwitterAuthorization() {
