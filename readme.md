@@ -5,13 +5,12 @@ This is just a concept of using Twitter for a encrypted file storage, not a seri
 
 Premise: encrypt and encode file, upload twitter size chunks as replies to the first tweet. Download using Twitter URL and key to decode. Additionally, the first tweet could hold the metadata about the file, such as filename, size, ...
 
-Inspired by a comment on @rauchg's require from Twitter HN post, which the following slide was posted:
-https://users.soe.ucsc.edu/~jpagnutt/Elevator_Pitch.pdf
+Inspired by @rauchg's Require from Twitter, and <a href="https://news.ycombinator.com/item?id=11352150">this comment</a> which linked to the slide: <a href="https://users.soe.ucsc.edu/~jpagnutt/Elevator_Pitch.pdf">https://users.soe.ucsc.edu/~jpagnutt/Elevator_Pitch.pdf</a>
 
 
 ### Setup
 
-Create a new Twitter app and create ~/.twstorage
+Create a <a href="https://apps.twitter.com/">new Twitter app</a> and create ~/.twstorage with:
 
 ```
 {
@@ -21,7 +20,7 @@ Create a new Twitter app and create ~/.twstorage
 ```
 
 
-### Build Tool
+### Build Tool using Go
 
 ```
 git clone github.com/mkaz/twstorage
@@ -38,8 +37,8 @@ twstorage filename.txt
     - stores credentials at ~/.twstorage
 
  Returns:
-   Tweet: <url>
    Key  : <key>
+   Tweet: <url>
 ```
 
 ### Decrypt Usage:
@@ -53,8 +52,8 @@ twstorage -k <key> <url>
 You should be able to test decoding using this Tweet and key:
 
 ```
-Tweet: https://twitter.com/mkaz/status/713567397869817856
 Key  : Kgo0BK5JVatO0kDCsJmgT59nQqNaLgkS
+Tweet: https://twitter.com/mkaz/status/713567397869817856
 ```
 
 Decrypt using:
@@ -62,7 +61,9 @@ Decrypt using:
 ./twstorage -k Kgo0BK5JVatO0kDCsJmgT59nQqNaLgkS https://twitter.com/mkaz/status/713567397869817856
 
 
-### Credits
+## Credits
 
-Twitter API code borrowed heavily from: https://github.com/mattn/twty
+* Twitter API code borrowed heavily from: https://github.com/mattn/twty
+* Encryption from: https://gist.github.com/kkirsche/e28da6754c39d5e7ea10
+
 
