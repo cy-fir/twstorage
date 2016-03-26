@@ -41,12 +41,14 @@ twstorage -k <key> <url>
 	os.Exit(1)
 }
 
+var dryRun bool
 var key string
 var token *oauth.Credentials
 
 func main() {
 
 	flag.StringVar(&key, "k", "", "encryption key")
+	flag.BoolVar(&dryRun, "dry-run", false, "No tweeting, just test")
 	flag.Parse()
 
 	if flag.NArg() == 0 {
@@ -80,8 +82,15 @@ func main() {
 
 		// chunkify tweet limits
 		chunksize := 137 - len(TwitterUsername)
-		fmt.Println("Chunk Size: ", chunksize)
 		chunks := chunkify(enc, chunksize)
+
+		if dryRun {
+			fmt.Println("Just a dry run...")
+			for i, chunk := range chunks {
+				fmt.Printf("Chunk [%d]: %s \n", i, chunk)
+			}
+			os.Exit(1)
+		}
 
 		// upload to twitter
 		var tweet, first Tweet
@@ -126,7 +135,7 @@ func main() {
 	// use key to decrypt
 	dec, err := decrypt(encText, key)
 	if err != nil {
-		fmt.Println("Error decrypting text")
+		fmt.Println("Error decrypting text: ", err)
 	}
 
 	fmt.Println(dec)
