@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 
 	"github.com/fatih/color"
@@ -20,14 +19,10 @@ import (
 type Tweet struct {
 	Text       string `json:"text"`
 	Identifier string `json:"id_str"`
-	Source     string `json:"source"`
-	CreatedAt  string `json:"created_at"`
 	ReplyId    string `json:"in_reply_to_status_id_str"`
 	User       struct {
-		Name            string `json:"name"`
-		ScreenName      string `json:"screen_name"`
-		FollowersCount  int    `json:"followers_count"`
-		ProfileImageURL string `json:"profile_image_url"`
+		Name       string `json:"name"`
+		ScreenName string `json:"screen_name"`
 	} `json:"user"`
 }
 
@@ -106,34 +101,6 @@ func getAccessToken(config map[string]string) (*oauth.Credentials, bool, error) 
 		authorized = true
 	}
 	return token, authorized, nil
-}
-
-// config stores at: ~/.twstorage
-// Requires client secret/token from https://dev.twitter.com/
-// If authorized, includes authorization tokens
-func getConfig() (string, map[string]string) {
-
-	dir := os.Getenv("HOME")
-	settings := filepath.Join(dir, ".twstorage")
-	config := map[string]string{}
-
-	b, err := ioutil.ReadFile(settings)
-	if err != nil {
-		fmt.Println("Error reading settings.")
-		fmt.Println("Create ~/.twstorage with your app settings from dev.twitter.com")
-		fmt.Println("{")
-		fmt.Println(`  "ClientSecret": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",`)
-		fmt.Println(`  "ClientToken": "abcdefghijklmnopqrstuvwxyz"`)
-		fmt.Println("}")
-		os.Exit(1)
-	} else {
-		err = json.Unmarshal(b, &config)
-		if err != nil {
-			log.Fatalf("Error in JSON? Could not unmarshal %v: %v", settings, err)
-		}
-	}
-
-	return settings, config
 }
 
 // TWITTER ENDPOINTS

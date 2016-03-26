@@ -7,11 +7,16 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/garyburd/go-oauth/oauth"
 )
+
+// ** CHANGE THIS
+// a quick hack for username, since used in reply
+const TwitterUsername string = "mkaz"
 
 func Usage() {
 	fmt.Println(`twstorage usage:
@@ -25,20 +30,16 @@ twstorage <filename>
       once authorized, will save tokens to ~/.twstorage
 
     Returns:
-        Tweet : <url>
         Key   : <key>
-        Nonce : <nonce>
+        Tweet : <url>
 
 # Decrypt Usage:
 
-twstorage --key <key> --nonce <nonce> <url>
+twstorage -k <key> <url>
 
 `)
 	os.Exit(1)
 }
-
-// a quick hack for username, since used in reply
-const TwitterUsername string = "mkaz"
 
 var key string
 var token *oauth.Credentials
@@ -151,6 +152,7 @@ func getTweetChain(token *oauth.Credentials, tweetId string) (str string, err er
 	return str, nil
 }
 
+// Reads Config and Setups Auth
 func TwitterAuthorization() {
 	var err error
 	authorized := false
@@ -161,6 +163,7 @@ func TwitterAuthorization() {
 		log.Fatalf("Failed to get access token: %s, %s, %s", token, authorized, err)
 	}
 
+	// save config file
 	if authorized {
 		b, err := json.MarshalIndent(config, "", "  ")
 		if err != nil {
@@ -171,5 +174,32 @@ func TwitterAuthorization() {
 			log.Fatal("failed to store file:", err)
 		}
 	}
+}
 
+// config stores at: ~/.twstorage
+// Requires client secret/token from https://dev.twitter.com/
+// If authorized, includes authorization tokens
+func getConfig() (string, map[string]string) {
+
+	dir := os.Getenv("HOME")
+	settings := filepath.Join(dir, ".twstorage")
+	config := map[string]string{}
+
+	b, err := ioutil.ReadFile(settings)
+	if err != nil {
+		fmt.Println("Error reading settings.")
+		fmt.Println("Create ~/.twstorage with your app settings from dev.twitter.com")
+		fmt.Println("{")
+		fmt.Println(`  "ClientSecret": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",`)
+		fmt.Println(`  "ClientToken": "abcdefghijklmnopqrstuvwxyz"`)
+		fmt.Println("}")
+		os.Exit(1)
+	} else {
+		err = json.Unmarshal(b, &config)
+		if err != nil {
+			log.Fatalf("Error in JSON? Could not unmarshal %v: %v", settings, err)
+		}
+	}
+
+	return settings, config
 }
