@@ -52,8 +52,12 @@ twstorage -k <key> <url>
 
 You should be able to test decoding using this Tweet and key:
 
+```
 Tweet: https://twitter.com/mkaz/status/713567397869817856
 Key  : Kgo0BK5JVatO0kDCsJmgT59nQqNaLgkS
+```
+
+Decrypt using:
 
 ./twstorage -k Kgo0BK5JVatO0kDCsJmgT59nQqNaLgkS https://twitter.com/mkaz/status/713567397869817856
 
